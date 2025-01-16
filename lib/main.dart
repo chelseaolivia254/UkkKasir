@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ukk_kasir/registrasi.dart';
 
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url:'https://fsibnukgosdpzwielizi.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzaWJudWtnb3NkcHp3aWVsaXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5ODk5MDQsImV4cCI6MjA1MjU2NTkwNH0.rWyjiz7_uVvnrsdUfTG1FSyHqed08Gly8guZEgxn_w4');
   runApp(MyApp());
 }
 
@@ -11,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Halaman Kasir',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
       ),
       home: LoginPage(),
     );
@@ -128,6 +135,7 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 
+
 class MenuPage extends StatefulWidget {
   @override
   _MenuPageState createState() => _MenuPageState();
@@ -175,6 +183,14 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
+  void _navigateTo(String route) {
+    // Handle navigation to different pages
+    Navigator.pop(context); // Close the drawer
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Navigating to $route')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -185,7 +201,7 @@ class _MenuPageState extends State<MenuPage> {
           backgroundColor: Colors.brown[600],
           bottom: TabBar(
             tabs: [
-              Tab(icon: Icon(Icons.fastfood, color: Colors.white,), text: 'Makanan',),
+              Tab(icon: Icon(Icons.fastfood, color: Colors.white), text: 'Makanan'),
               Tab(icon: Icon(Icons.local_drink, color: Colors.white,), text: 'Minuman'),
               
             ],
@@ -196,6 +212,42 @@ class _MenuPageState extends State<MenuPage> {
               onPressed: _showCart,
             ),
           ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.brown[600],
+                ),
+                child: Center(
+                  child: Text(
+                    'Pengaturan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.person, color: Colors.brown),
+                title: Text('Profil'),
+                onTap: () => _navigateTo('Profil'),
+              ),
+              ListTile(
+                leading: Icon(Icons.app_registration, color: Colors.brown),
+                title: Text('Registrasi'),
+                onTap: () => _navigateTo('Registrasi'),
+              ),
+              ListTile(
+                leading: Icon(Icons.logout, color: Colors.brown),
+                title: Text('Logout'),
+                onTap: () => _navigateTo('Logout'),
+              ),
+            ],
+          ),
         ),
         body: Column(
           children: [
