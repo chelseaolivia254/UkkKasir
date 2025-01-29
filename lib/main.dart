@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ukk_kasir/registrasi.dart';
-
+import 'package:ukk_kasir/Pelanggan/dataPelanggan.dart';
+import 'package:ukk_kasir/Penjulan/dataPenjualan.dart';
+import 'package:ukk_kasir/tambahproduk.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-    url:'https://fsibnukgosdpzwielizi.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzaWJudWtnb3NkcHp3aWVsaXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5ODk5MDQsImV4cCI6MjA1MjU2NTkwNH0.rWyjiz7_uVvnrsdUfTG1FSyHqed08Gly8guZEgxn_w4');
+    url: 'https://fsibnukgosdpzwielizi.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzaWJudWtnb3NkcHp3aWVsaXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5ODk5MDQsImV4cCI6MjA1MjU2NTkwNH0.rWyjiz7_uVvnrsdUfTG1FSyHqed08Gly8guZEgxn_w4',
+  );
   runApp(MyApp());
 }
 
@@ -38,34 +41,31 @@ class _LoginPageState extends State<LoginPage> {
   String? _passwordError;
 
   void _login() {
-  setState(() {
-    // Email validation using regular expression
-    String emailPattern =
-        r"^[a-zA-Z0-9]+([._%+-]*[a-zA-Z0-9])*@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$";
-    RegExp regex = RegExp(emailPattern);
+    setState(() {
+      String emailPattern =
+          r"^[a-zA-Z0-9]+([._%+-]*[a-zA-Z0-9])*@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$";
+      RegExp regex = RegExp(emailPattern);
 
-    _emailError =
-        emailController.text.isEmpty ? 'Email tidak boleh kosong' : null;
+      _emailError =
+          emailController.text.isEmpty ? 'Email tidak boleh kosong' : null;
 
-    // Check if email format is correct
-    if (_emailError == null && !regex.hasMatch(emailController.text)) {
-      _emailError = 'Format email tidak valid';
+      if (_emailError == null && !regex.hasMatch(emailController.text)) {
+        _emailError = 'Format email tidak valid';
+      }
+
+      _passwordError = passwordController.text.isEmpty
+          ? 'Password tidak boleh kosong'
+          : null;
+    });
+
+    if (_emailError == null && _passwordError == null) {
+      // Simulasi login berhasil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MenuPage()),
+      );
     }
-
-    _passwordError = passwordController.text.isEmpty
-        ? 'Password tidak boleh kosong'
-        : null;
-  });
-
-  // Proceed if there are no errors
-  if (_emailError == null && _passwordError == null) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MenuPage()),
-    );
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +127,15 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _login,
               child: Text('Login'),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RegistrationPage()),
+                );
+              },
+              child: Text('Belum punya akun? Registrasi'),
+            ),
           ],
         ),
       ),
@@ -134,7 +143,111 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+class RegistrationPage extends StatefulWidget {
+  @override
+  _RegistrationPageState createState() => _RegistrationPageState();
+}
 
+class _RegistrationPageState extends State<RegistrationPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  String? _emailError;
+  String? _passwordError;
+  String? _confirmPasswordError;
+
+  void _register() {
+    setState(() {
+      String emailPattern =
+          r"^[a-zA-Z0-9]+([._%+-]*[a-zA-Z0-9])*@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$";
+      RegExp regex = RegExp(emailPattern);
+
+      _emailError =
+          emailController.text.isEmpty ? 'Email tidak boleh kosong' : null;
+
+      if (_emailError == null && !regex.hasMatch(emailController.text)) {
+        _emailError = 'Format email tidak valid';
+      }
+
+      _passwordError = passwordController.text.isEmpty
+          ? 'Password tidak boleh kosong'
+          : null;
+
+      _confirmPasswordError = confirmPasswordController.text.isEmpty
+          ? 'Konfirmasi password tidak boleh kosong'
+          : null;
+
+      if (_passwordError == null && _confirmPasswordError == null) {
+        if (passwordController.text != confirmPasswordController.text) {
+          _confirmPasswordError = 'Password tidak cocok';
+        }
+      }
+    });
+
+    if (_emailError == null &&
+        _passwordError == null &&
+        _confirmPasswordError == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text('Registrasi berhasil!')), // Simpan data jika diperlukan.
+      );
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Registrasi'),
+        backgroundColor: Colors.brown[600],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+                errorText: _emailError,
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+                errorText: _passwordError,
+              ),
+              obscureText: true,
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: confirmPasswordController,
+              decoration: InputDecoration(
+                labelText: 'Konfirmasi Password',
+                border: OutlineInputBorder(),
+                errorText: _confirmPasswordError,
+              ),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _register,
+              child: Text('Daftar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class MenuPage extends StatefulWidget {
   @override
@@ -142,23 +255,50 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  final List<Map<String, dynamic>> foodMenu = [
-    {'name': 'Dimsum Mentai','price': 15000,'image': 'assets/images/Dimsum Mentai.jpg'},
-    {'name': 'Mie Ayam', 'price': 12000, 'image': 'assets/images/Mie Ayam.jpg'},
-    {'name': 'Ayam Geprek','price': 17000,'image': 'assets/images/Ayam Geprek.jpg'},
-    {'name': 'Burger', 'price': 17000, 'image': 'assets/images/Burger.jpg'},
-    {'name': 'Moci', 'price': 17000, 'image': 'assets/images/Moci.jpg'},
-    {'name': 'Pizza', 'price': 17000, 'image': 'assets/images/Pizza.jpg'},
-  ];
-
-  final List<Map<String, dynamic>> drinkMenu = [
-    {'name': 'Americano', 'price': 18000, 'icon': Icons.coffee},
-    {'name': 'Lemon Tea', 'price': 12000, 'icon': Icons.local_cafe},
-    {'name': 'Latte', 'price': 20000, 'icon': Icons.emoji_food_beverage},
-    {'name': 'Caramel Coffe', 'price': 20000, 'icon': Icons.coffee},
-  ];
-
+  // final List<Map<String, dynamic>> foodMenu = [
+  //   {
+  //     'name': 'Dimsum Mentai',
+  //     'price': 20000,
+  //     'image': 'assets/images/Dimsum Mentai.jpg'
+  //   },
+  //   {'name': 'Salmon', 'price': 50000, 'image': 'assets/images/salmon.jpg'},
+  //   {
+  //     'name': 'Ayam Geprek',
+  //     'price': 17000,
+  //     'image': 'assets/images/Ayam Geprek.jpg'
+  //   },
+  //   {'name': 'Burger', 'price': 27000, 'image': 'assets/images/Burger.jpg'},
+  //   {'name': 'Moci', 'price': 20000, 'image': 'assets/images/Moci.jpg'},
+  //   {'name': 'Pizza', 'price': 40000, 'image': 'assets/images/Pizza.jpg'},
+  //   {'name': 'Ramen', 'price': 30000, 'image': 'assets/images/ramen.jpg'},
+  //   {
+  //     'name': 'Spaghetti',
+  //     'price': 30000,
+  //     'image': 'assets/images/Spaghetti.jpg'
+  //   },
+  //   {'name': 'Americano', 'price': 18000, 'icon': Icons.coffee},
+  //   {'name': 'Lemon Tea', 'price': 12000, 'icon': Icons.local_cafe},
+  //   {'name': 'Latte', 'price': 20000, 'icon': Icons.emoji_food_beverage},
+  //   {'name': 'Caramel Coffe', 'price': 20000, 'icon': Icons.coffee},
+  // ];
+  List<Map<String, dynamic>>? foodMenu;
   final List<Map<String, dynamic>> cart = [];
+
+  fetchProduct() async {
+    var response = await Supabase.instance.client.from('produk').select();
+    if (response.isNotEmpty) {
+      setState(() {
+        foodMenu = response;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchProduct();
+  }
 
   void _addToCart(Map<String, dynamic> item) {
     setState(() {
@@ -174,8 +314,8 @@ class _MenuPageState extends State<MenuPage> {
           itemCount: cart.length,
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text(cart[index]['name']),
-              subtitle: Text('Harga: Rp ${cart[index]['price']}'),
+              title: Text(cart[index]['namaproduk']),
+              subtitle: Text('Harga: Rp ${cart[index]['harga']}'),
             );
           },
         );
@@ -183,98 +323,135 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  void _navigateTo(String route) {
-    // Handle navigation to different pages
-    Navigator.pop(context); // Close the drawer
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Navigating to $route')),
+  void _logout() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 4,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('Menu Makanan dan Minuman'),
-          backgroundColor: Colors.brown[600],
-          bottom: TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.fastfood, color: Colors.white), text: 'Makanan'),
-              Tab(icon: Icon(Icons.local_drink, color: Colors.white,), text: 'Minuman'),
-              
+          appBar: AppBar(
+            title: Text('Menu Makanan dan Minuman'),
+            backgroundColor: Colors.brown[600],
+            bottom: TabBar(
+              tabs: [
+                Tab(
+                    icon: Icon(
+                      Icons.people,
+                      color: Colors.white,
+                    ),
+                    text: 'Pelanggan'),
+                Tab(
+                  icon: Icon(
+                    Icons.inventory,
+                    color: Colors.white,
+                  ),
+                  text: 'Produk',
+                ),
+                Tab(
+                    icon: Icon(
+                      Icons.shopping_cart,
+                      color: Colors.white,
+                    ),
+                    text: 'Penjualan'),
+                Tab(
+                  icon: Icon(
+                    Icons.account_balance_wallet,
+                    color: Colors.white,
+                  ),
+                  text: 'Detail Penjualan',
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: _showCart,
+              ),
             ],
           ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: _showCart,
-            ),
-          ],
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.brown[600],
-                ),
-                child: Center(
+          drawer: Drawer(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Colors.brown[600],
+                  ),
                   child: Text(
-                    'Pengaturan',
+                    'Menu',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                     ),
                   ),
                 ),
-              ),
-              ListTile(
-                leading: Icon(Icons.person, color: Colors.brown),
-                title: Text('Profil'),
-                onTap: () => _navigateTo('Profil'),
-              ),
-              ListTile(
-                leading: Icon(Icons.app_registration, color: Colors.brown),
-                title: Text('Registrasi'),
-                onTap: () => _navigateTo('Registrasi'),
-              ),
-              ListTile(
-                leading: Icon(Icons.logout, color: Colors.brown),
-                title: Text('Logout'),
-                onTap: () => _navigateTo('Logout'),
-              ),
-            ],
+                ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text('Profil'),
+                  onTap: () {
+                    // Navigate to profile page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ProfilePage()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text('Logout'),
+                  onTap: _logout,
+                ),
+              ],
+            ),
           ),
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Selamat datang di menu KopiShop kami!',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.brown[800]),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  MenuGrid(
-                      menu: foodMenu, useIcon: false, addToCart: _addToCart),
-                  MenuGrid(
-                      menu: drinkMenu, useIcon: true, addToCart: _addToCart),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          body: foodMenu == null
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Selamat datang di menu KopiShop kami!',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.brown[800]),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          PelangganBookListPage(), // Aliased class from Pelanggan
+                          MenuGrid(
+                              menu: foodMenu!,
+                              useIcon: false,
+                              addToCart: _addToCart),
+                          PenjualanBookListPage(),
+                          Center() // Aliased class from Penjualan
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              var result = await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddProductPage()));
+              if (result == true) {
+                fetchProduct();
+              }
+            },
+            child: Icon(Icons.add),
+          )),
     );
   }
 }
@@ -289,69 +466,92 @@ class MenuGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: EdgeInsets.all(16.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: menu.length,
-      itemBuilder: (context, index) {
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (useIcon)
-                Expanded(
-                  child: Icon(
-                    menu[index]['icon'],
-                    size: 80,
-                    color: Colors.brown,
+    return Scaffold(
+      body: GridView.builder(
+        padding: EdgeInsets.all(16.0),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 16.0,
+          childAspectRatio: 1.5,
+        ),
+        itemCount: menu.length,
+        itemBuilder: (context, index) {
+          return Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (useIcon)
+                  Expanded(
+                    child: Icon(
+                      menu[index]['icon'],
+                      size: 80,
+                      color: Colors.brown,
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      menu[index]['namaproduk'],
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    'Harga: Rp ${menu[index]['harga']}',
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                ),
+                SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.shopping_cart),
+                        color: Colors.brown,
+                        iconSize: 24.0,
+                        onPressed: () => addToCart(menu[index]),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        color: Colors.blue,
+                        iconSize: 24.0,
+                        onPressed: () {
+                          // Logika untuk mengedit produk
+                          // editProduct(menu[index]);
+                        },
+                      ),
+                    ],
                   ),
                 )
-              else
-                ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                  child: Image.asset(
-                    menu[index]['image'],
-                    fit: BoxFit.cover,
-                    height: 150,
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  menu[index]['name'],
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 5,),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  'Harga: Rp ${menu[index]['price']}',
-                  style: TextStyle(fontSize: 16, color: Colors.black),
-                ),
-              ),
-              SizedBox(height: 5,),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  icon: Icon(Icons.shopping_cart),
-                  color: Colors.brown,
-                  iconSize: 24.0, // Adjust the size to your preference
-                  onPressed: () => addToCart(menu[index]),
-                ),
-              )
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profil'),
+      ),
+      body: Center(
+        child: Text('Halaman Profil'),
+      ),
     );
   }
 }
