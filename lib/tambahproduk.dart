@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ukk_kasir/main.dart';
+
 
 class AddProductPage extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();

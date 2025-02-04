@@ -281,23 +281,13 @@ class _MenuPageState extends State<MenuPage> {
   //   {'name': 'Latte', 'price': 20000, 'icon': Icons.emoji_food_beverage},
   //   {'name': 'Caramel Coffe', 'price': 20000, 'icon': Icons.coffee},
   // ];
-  List<Map<String, dynamic>>? foodMenu;
+  // List<Map<String, dynamic>>? foodMenu;
   final List<Map<String, dynamic>> cart = [];
-
-  fetchProduct() async {
-    var response = await Supabase.instance.client.from('produk').select();
-    if (response.isNotEmpty) {
-      setState(() {
-        foodMenu = response;
-      });
-    }
-  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchProduct();
   }
 
   void _addToCart(Map<String, dynamic> item) {
@@ -335,138 +325,152 @@ class _MenuPageState extends State<MenuPage> {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-          appBar: AppBar(
-            title: Text('Menu Makanan dan Minuman'),
-            backgroundColor: Colors.brown[600],
-            bottom: TabBar(
-              tabs: [
-                Tab(
-                    icon: Icon(
-                      Icons.people,
-                      color: Colors.white,
-                    ),
-                    text: 'Pelanggan'),
-                Tab(
+        appBar: AppBar(
+          title: Text('Menu Makanan dan Minuman'),
+          backgroundColor: Colors.brown[600],
+          bottom: TabBar(
+            tabs: [
+              Tab(
                   icon: Icon(
-                    Icons.inventory,
+                    Icons.people,
                     color: Colors.white,
                   ),
-                  text: 'Produk',
+                  text: 'Pelanggan'),
+              Tab(
+                icon: Icon(
+                  Icons.inventory,
+                  color: Colors.white,
                 ),
-                Tab(
-                    icon: Icon(
-                      Icons.shopping_cart,
-                      color: Colors.white,
-                    ),
-                    text: 'Penjualan'),
-                Tab(
+                text: 'Produk',
+              ),
+              Tab(
                   icon: Icon(
-                    Icons.account_balance_wallet,
+                    Icons.shopping_cart,
                     color: Colors.white,
                   ),
-                  text: 'Detail Penjualan',
+                  text: 'Penjualan'),
+              Tab(
+                icon: Icon(
+                  Icons.account_balance_wallet,
+                  color: Colors.white,
                 ),
-              ],
-            ),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.shopping_cart),
-                onPressed: _showCart,
+                text: 'Detail Penjualan',
               ),
             ],
           ),
-          drawer: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Colors.brown[600],
-                  ),
-                  child: Text(
-                    'Menu',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text('Profil'),
-                  onTap: () {
-                    // Navigate to profile page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ProfilePage()),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.logout),
-                  title: Text('Logout'),
-                  onTap: _logout,
-                ),
-              ],
+          actions: [
+            IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: _showCart,
             ),
-          ),
-          body: foodMenu == null
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'Selamat datang di menu KopiShop kami!',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.brown[800]),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          PelangganBookListPage(), // Aliased class from Pelanggan
-                          MenuGrid(
-                              menu: foodMenu!,
-                              useIcon: false,
-                              addToCart: _addToCart),
-                          PenjualanBookListPage(),
-                          Center() // Aliased class from Penjualan
-                        ],
-                      ),
-                    ),
-                  ],
+          ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.brown[600],
                 ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              var result = await Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AddProductPage()));
-              if (result == true) {
-                fetchProduct();
-              }
-            },
-            child: Icon(Icons.add),
-          )),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: Icon(Icons.person),
+                title: Text('Profil'),
+                onTap: () {
+                  // Navigate to profile page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text('Logout'),
+                onTap: _logout,
+              ),
+            ],
+          ),
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Selamat datang di menu KopiShop kami!',
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.brown[800]),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  PelangganBookListPage(), // Aliased class from Pelanggan
+                  MenuGrid(useIcon: false, addToCart: _addToCart),
+                  PenjualanBookListPage(),
+                  //Center(),
+                  Center() // Aliased class from Penjualan
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class MenuGrid extends StatelessWidget {
-  final List<Map<String, dynamic>> menu;
+class MenuGrid extends StatefulWidget {
+  // final List<Map<String, dynamic>> menu;
   final bool useIcon;
   final Function(Map<String, dynamic>) addToCart;
+  MenuGrid({required this.useIcon, required this.addToCart});
 
-  MenuGrid(
-      {required this.menu, required this.useIcon, required this.addToCart});
+  State<MenuGrid> createState() => MenuGridState();
+}
+
+class MenuGridState extends State<MenuGrid> {
+  var foodMenu = [];
+  fetchProduct() async {
+    var response = await Supabase.instance.client.from('produk').select();
+    if (response.isNotEmpty) {
+      setState(() {
+        foodMenu = response;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchProduct();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          var result = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => AddProductPage()));
+          if (result == true) {
+            fetchProduct();
+          }
+        },
+        child: Icon(Icons.add),
+      ),
       body: GridView.builder(
         padding: EdgeInsets.all(16.0),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -475,7 +479,7 @@ class MenuGrid extends StatelessWidget {
           mainAxisSpacing: 16.0,
           childAspectRatio: 1.5,
         ),
-        itemCount: menu.length,
+        itemCount: foodMenu.length,
         itemBuilder: (context, index) {
           return Card(
             shape: RoundedRectangleBorder(
@@ -484,10 +488,10 @@ class MenuGrid extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (useIcon)
+                if (widget.useIcon)
                   Expanded(
                     child: Icon(
-                      menu[index]['icon'],
+                      foodMenu[index]['icon'],
                       size: 80,
                       color: Colors.brown,
                     ),
@@ -496,7 +500,7 @@ class MenuGrid extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      menu[index]['namaproduk'],
+                      foodMenu[index]['namaproduk'],
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -505,7 +509,7 @@ class MenuGrid extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
-                    'Harga: Rp ${menu[index]['harga']}',
+                    'Harga: Rp ${foodMenu[index]['harga']}',
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
@@ -519,7 +523,7 @@ class MenuGrid extends StatelessWidget {
                         icon: Icon(Icons.shopping_cart),
                         color: Colors.brown,
                         iconSize: 24.0,
-                        onPressed: () => addToCart(menu[index]),
+                        onPressed: () => widget.addToCart(foodMenu[index]),
                       ),
                       IconButton(
                         icon: Icon(Icons.edit),
@@ -527,7 +531,16 @@ class MenuGrid extends StatelessWidget {
                         iconSize: 24.0,
                         onPressed: () {
                           // Logika untuk mengedit produk
-                          // editProduct(menu[index]);
+                          //// editProduct(foodMenu[index]);
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        color: Colors.blue,
+                        iconSize: 24.0,
+                        onPressed: () {
+                          // Logika untuk mengedit produk
+                          //// editProduct(foodMenu[index]);
                         },
                       ),
                     ],

@@ -4,33 +4,59 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ukk_kasir/Penjulan/dataPenjualan.dart';
 import 'package:ukk_kasir/Penjulan/insert_Penjualan.dart';
 
+
 class PenjualanBookListPage extends StatefulWidget {
-  const PenjualanBookListPage({super.key});
+  final int? penjualanid;
+
+   PenjualanBookListPage({super.key, this.penjualanid});
 
   @override
   _BookListPageState createState() => _BookListPageState();
 }
 
 class _BookListPageState extends State<PenjualanBookListPage> {
+  final nmplg = TextEditingController();
+  final almt = TextEditingController();
+  final nmtlp = TextEditingController();
+  final formKey = GlobalKey<FormState>();
   // Buat variabel untuk menyimpan daftar buku
   List<Map<String, dynamic>> penjualan = [];
 
   @override
   void initState() {
     super.initState();
-    fetchBook();
+    fetchpenjualan();
   }
 
-  Future<void> fetchBook() async {
-    final response = await Supabase.instance.client.from('penjualan').select();
-
-    setState(() {
-      penjualan = List<Map<String, dynamic>>.from(response);
-    });
+  Future<void> fetchpenjualan() async {
+    try {
+      final response = await Supabase.instance.client.from('penjualan').select();
+      setState(() {
+        penjualan= response;
+        // nmplg.text = response['tanggalPenjualan'] ?? '';
+        // almt.text = response['totalHarga'] ?? '';
+        // nmtlp.text = response['pelangganid']?.toString() ?? '';
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('error : $e')));
+    }
   }
+
+  // Future<void> updatepenjualan() async {
+  //   await Supabase.instance.client.from('penjualan').update(
+  //     {
+  //       'tanggalPenjualan': nmplg.text,
+  //       'totalHarga': almt.text,
+  //       'pelangganid': nmtlp.text
+  //     }
+  //   ).eq('pelangganid', widget.penjualanid);
+
+  //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+  // }
+
+
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,17 +91,21 @@ class _BookListPageState extends State<PenjualanBookListPage> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () {
+                          onPressed: () async{
                            
                             // Tambahkan logika navigasi ke halaman edit
                           },
                         ),
-                        IconButton(
+                       IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () {
+                          onPressed: () async{
+                            var hapus =await Supabase.instance.client.from('pelanggan').delete().eq('pelangganid', book['pelangganid']);
+                            if (hapus== null) {fetchpenjualan();
+                              
+                            }
                             // Tambahkan logika hapus buku
                           },
-                        ),
+                        )
                       ],
                     ),
                   ),
@@ -86,10 +116,10 @@ class _BookListPageState extends State<PenjualanBookListPage> {
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddBookPage()),
+            MaterialPageRoute(builder: (context) => const AddPenjualanPage()),
           );
           if (result == true) {
-            fetchBook(); // Refresh data jika buku berhasil ditambahkan
+            fetchpenjualan(); // Refresh data jika pelanggan berhasil ditambahkan
           }
         },
         backgroundColor: Colors.blueAccent,

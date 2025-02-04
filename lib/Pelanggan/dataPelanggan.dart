@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ukk_kasir/Pelanggan/dataPelanggan.dart';
 import 'package:ukk_kasir/Pelanggan/insert_Pelanggan.dart';
 
 class PelangganBookListPage extends StatefulWidget {
@@ -91,7 +90,7 @@ class _BookListPageState extends State<PelangganBookListPage> {
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddBookPage()),
+            MaterialPageRoute(builder: (context) => const AddPelangganPage()),
           );
           if (result == true) {
             fetchBook(); // Refresh data jika buku berhasil ditambahkan

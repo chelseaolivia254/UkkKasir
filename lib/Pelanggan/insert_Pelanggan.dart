@@ -3,12 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ukk_kasir/main.dart';
 
 
-class AddBookPage extends StatefulWidget {
-  const AddBookPage({super.key});
+class AddPelangganPage extends StatefulWidget {
+  const AddPelangganPage({super.key});
   @override
   _AddBookPageState createState() => _AddBookPageState();
 }
-class _AddBookPageState extends State<AddBookPage> {
+class _AddBookPageState extends State<AddPelangganPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _namaPelangganController = TextEditingController();
   final TextEditingController _alamatController = TextEditingController();

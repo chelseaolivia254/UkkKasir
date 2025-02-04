@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ukk_kasir/main.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
   runApp(MyApp());
